@@ -79,6 +79,7 @@ public class MovieDetailActivity extends AppCompatActivity implements View.OnCli
         ResultsItem movie = getIntent().getParcelableExtra(EXTRA_MOVIE);
 
         if (v.getId() == R.id.button_favorite_movie) {
+            int favorite_id = movie.getId();
             String title = movie.getTitle();
             String overview = movie.getOverview();
             String releaseDate = movie.getReleaseDate();
@@ -86,25 +87,9 @@ public class MovieDetailActivity extends AppCompatActivity implements View.OnCli
             String backdropPath = movie.getBackdropPath();
             String favoriteType = "movie";
 
-            // Log Berhasil
-            Log.d(TAG, "detail 1 : " + title);
-            Log.d(TAG, "detail 2 : " + overview);
-            Log.d(TAG, "detail 3 : " + releaseDate);
-            Log.d(TAG, "detail 4 : " + posterPath);
-            Log.d(TAG, "detail 5 : " + backdropPath);
-            Log.d(TAG, "detail 6 : " + favoriteType);
-
-            Favorite favorite = new Favorite();
-
-            favorite.setTitle(title);
-            favorite.setOverview(overview);
-            favorite.setReleaseDate(releaseDate);
-            favorite.setPosterPath(posterPath);
-            favorite.setBackdropPath(backdropPath);
-            favorite.setTypeFavorite(favoriteType);
-
+            Favorite data = new Favorite(favorite_id, title, overview, releaseDate, posterPath, backdropPath, favoriteType);
             // Gagal (Null Reference)
-            favoriteViewModel.insert(favorite);
+            favoriteViewModel.insert(data);
 
             Toast.makeText(this, "Success Add Favorite Movie", Toast.LENGTH_SHORT).show();
 
