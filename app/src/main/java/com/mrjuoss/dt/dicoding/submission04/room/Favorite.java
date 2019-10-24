@@ -1,20 +1,17 @@
 package com.mrjuoss.dt.dicoding.submission04.room;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity
+@Entity(tableName = "favorite")
 public class Favorite {
 
     @PrimaryKey(autoGenerate = true)
-    @NonNull
     private int id;
 
     private int favorite_id;
-
     private String title;
     private String overview;
 
@@ -94,6 +91,18 @@ public class Favorite {
         this.typeFavorite = typeFavorite;
     }
 
+    public Favorite(int id, int favorite_id, String title, String overview, String releaseDate, String posterPath, String backdropPath, String typeFavorite) {
+        this.id = id;
+        this.favorite_id = favorite_id;
+        this.title = title;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+        this.posterPath = posterPath;
+        this.backdropPath = backdropPath;
+        this.typeFavorite = typeFavorite;
+    }
+
+    @Ignore
     public Favorite(int favorite_id, String title, String overview, String releaseDate, String posterPath, String backdropPath, String typeFavorite) {
         this.favorite_id = favorite_id;
         this.title = title;
