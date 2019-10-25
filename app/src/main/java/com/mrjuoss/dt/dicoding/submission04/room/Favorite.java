@@ -91,6 +91,7 @@ public class Favorite {
         this.typeFavorite = typeFavorite;
     }
 
+    @Ignore
     public Favorite(int id, int favorite_id, String title, String overview, String releaseDate, String posterPath, String backdropPath, String typeFavorite) {
         this.id = id;
         this.favorite_id = favorite_id;
@@ -103,6 +104,10 @@ public class Favorite {
     }
 
     @Ignore
+    public Favorite() {
+    }
+
+
     public Favorite(int favorite_id, String title, String overview, String releaseDate, String posterPath, String backdropPath, String typeFavorite) {
         this.favorite_id = favorite_id;
         this.title = title;

@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.mrjuoss.dt.dicoding.submission04.room.Favorite;
 import com.mrjuoss.dt.dicoding.submission04.room.FavoriteRepository;
@@ -13,28 +14,28 @@ import java.util.List;
 
 public class FavoriteViewModel extends AndroidViewModel {
 
-    private FavoriteRepository repository;
-    private LiveData<List<Favorite>> listFavorite;
+    private FavoriteRepository mRepository;
+    private LiveData<List<Favorite>> mAllFavorites;
 
     public FavoriteViewModel(@NonNull Application application) {
         super(application);
-        repository = new FavoriteRepository(application);
-        listFavorite = repository.getAllFavorites();
+        mRepository = new FavoriteRepository(application);
+        mAllFavorites = mRepository.getAllFavorites();
+    }
+
+
+    public LiveData<List<Favorite>> getAllFavorites() {
+        if (mAllFavorites == null) {
+            mAllFavorites = new MutableLiveData<List<Favorite>>();
+        }
+        return mAllFavorites;
     }
 
     public void insert(Favorite favorite) {
-        repository.insert(favorite);
+        mRepository.insert(favorite);
     }
 
-    public void delete(Favorite favorite) {
-        repository.delete(favorite);
+    public void delete (Favorite favorite) {
+        mRepository.delete(favorite);
     }
-    public void deleteAll() {
-        repository.deleteAll();
-    }
-
-    public LiveData<List<Favorite>> getListFavorite() {
-        return listFavorite;
-    }
-
 }

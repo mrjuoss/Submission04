@@ -1,5 +1,6 @@
 package com.mrjuoss.dt.dicoding.submission04.ui.movie;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,19 +9,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.mrjuoss.dt.dicoding.submission04.R;
 import com.mrjuoss.dt.dicoding.submission04.model.movie.ResultsItem;
 import com.mrjuoss.dt.dicoding.submission04.room.Favorite;
-import com.mrjuoss.dt.dicoding.submission04.room.FavoriteDatabase;
 import com.mrjuoss.dt.dicoding.submission04.viewmodel.FavoriteViewModel;
+
+import java.util.List;
 
 public class MovieDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String EXTRA_MOVIE = "extra_movie";
+    public static final int NEW_FAVORITE_ACTIVITY_REQUEST_CODE = 1;
 
+    private FavoriteViewModel mFavoriteViewModel;
 
     ProgressBar progressBarDetailMovie;
     ImageView imageDetailPosterMovie;
@@ -29,8 +36,6 @@ public class MovieDetailActivity extends AppCompatActivity implements View.OnCli
     TextView textDetailreleaseMovie;
     TextView textDetailOverviewMovie;
     Button buttonFavorite;
-
-    FavoriteViewModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +52,9 @@ public class MovieDetailActivity extends AppCompatActivity implements View.OnCli
         progressBarDetailMovie.setVisibility(View.VISIBLE);
 
         buttonFavorite = findViewById(R.id.button_favorite_movie);
-        buttonFavorite.setTag(1);
+        buttonFavorite.setTag("add");
         buttonFavorite.setOnClickListener(this);
-
+        
         showDetail();
 
     }
@@ -76,39 +81,33 @@ public class MovieDetailActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View v) {
-        ResultsItem movie = getIntent().getParcelableExtra(EXTRA_MOVIE);
-        int favorite_id = movie.getId();
-        String title = movie.getTitle();
-        String overview = movie.getOverview();
-        String releaseDate = movie.getReleaseDate();
-        String posterPath = movie.getPosterPath();
-        String backdropPath = movie.getBackdropPath();
-        String favoriteType = "movie";
-
-        FavoriteDatabase db = FavoriteDatabase.getInstance(this);
-        Favorite data = new Favorite(favorite_id, title, overview, releaseDate, posterPath, backdropPath, favoriteType);
-
         if (v.getId() == R.id.button_favorite_movie) {
-            final int status = (Integer) v.getTag();
-            if (status == 1) {
+            Intent intent = new Intent(this, MovieDetailActivity.class);
+            startActivityForResult(intent, NEW_FAVORITE_ACTIVITY_REQUEST_CODE);
 
-                model = new FavoriteViewModel(getApplication());
-                model.insert(data);
-                // Gagal (Null Reference)
-                //db.favoriteDao().insert(data);
-                //favoriteViewModel.insert(data);
-                Toast.makeText(this, "Success Add Favorite Movie", Toast.LENGTH_SHORT).show();
-
-                buttonFavorite.setTag(0);
-                buttonFavorite.setText(R.string.add_favorite);
-            } else {
-                //favoriteViewModel.delete(data);
-                //favoriteViewModel.delete();
-                buttonFavorite.setTag(1);
-                buttonFavorite.setText(R.string.remove_favorite);
-            }
         }
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == NEW_FAVORITE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            ResultsItem movie = getIntent().getParcelableExtra(EXTRA_MOVIE);
+            Favorite favorite = new Favorite(movie.getId(), movie.getTitle(), movie.getOverview(), movie.getReleaseDate(), movie.getPosterPath(), movie.getBackdropPath(), "movie");
+            if (buttonFavorite.getTag().toString() == "add") {
+                mFavoriteViewModel.insert(favorite);
+                Toast.makeText(this, "Berhasil Simpan Data", Toast.LENGTH_SHORT).show();
+                buttonFavorite.setTag("remove");
+                buttonFavorite.setText(R.string.remove_favorite);
+            } else {
+                mFavoriteViewModel.delete(favorite);
+                Toast.makeText(this, "Berhasil menghapus data", Toast.LENGTH_SHORT).show();
+                buttonFavorite.setTag("add");
+                buttonFavorite.setText(R.string.add_favorite);
+            }
 
+        } else {
+            Toast.makeText(this, "Gagal Simpan Data", Toast.LENGTH_SHORT).show();
+        }
     }
 }
