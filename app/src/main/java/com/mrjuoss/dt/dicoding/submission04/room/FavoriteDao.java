@@ -13,7 +13,7 @@ import java.util.List;
 public interface FavoriteDao {
 
     @Insert
-    long[] insert(Favorite... favorites);
+    long[] insertFavorite(Favorite... favorites);
 
     @Query("SELECT * FROM favorites")
     LiveData<List<Favorite>> getFavorites();
@@ -21,13 +21,12 @@ public interface FavoriteDao {
     @Query("SELECT * FROM favorites WHERE title LIKE :title")
     List<Favorite> getFavoriteByCustomQuery(String title);
 
-    @Update
-    int update(Favorite... favorites);
-
     @Delete
-    int delete(Favorite... favorites);
+    int deleteFavorite(Favorite... favorites);
 
     @Query("DELETE FROM favorites")
     void deleteAll();
 
+    @Update
+    int update(Favorite... favorites);
 }

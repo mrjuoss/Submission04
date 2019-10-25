@@ -1,11 +1,10 @@
 package com.mrjuoss.dt.dicoding.submission04.room;
 
-import android.app.Application;
 import android.content.Context;
-import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
+import com.mrjuoss.dt.dicoding.submission04.room.async.DeleteAsyncTask;
 import com.mrjuoss.dt.dicoding.submission04.room.async.InsertAsyncTask;
 
 import java.util.List;
@@ -17,9 +16,6 @@ public class FavoriteRepository {
     public FavoriteRepository(Context context) {
         mFavoriteDatabase = FavoriteDatabase.getInstance(context);
     }
-
-    private FavoriteDao favoriteDao;
-    private LiveData<List<Favorite>> mAllFavorites;
 
     public void insertFavorite(Favorite favorite) {
         new InsertAsyncTask(mFavoriteDatabase.getFavoriteDao()).execute(favorite);
@@ -34,6 +30,7 @@ public class FavoriteRepository {
     }
 
     public void deleteFavorite(Favorite favorite) {
+        new DeleteAsyncTask(mFavoriteDatabase.getFavoriteDao()).execute(favorite);
 
     }
 }
