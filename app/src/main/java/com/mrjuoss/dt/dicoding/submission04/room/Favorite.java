@@ -1,18 +1,26 @@
 package com.mrjuoss.dt.dicoding.submission04.room;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "favorite")
-public class Favorite {
+@Entity(tableName = "favorites")
+public class Favorite implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    @ColumnInfo(name = "favorite_id")
     private int favorite_id;
+
+    @ColumnInfo(name = "title")
     private String title;
+
+    @ColumnInfo(name = "overview")
     private String overview;
 
     @ColumnInfo(name = "release_date")
@@ -116,5 +124,60 @@ public class Favorite {
         this.posterPath = posterPath;
         this.backdropPath = backdropPath;
         this.typeFavorite = typeFavorite;
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeInt(this.favorite_id);
+        dest.writeString(this.title);
+        dest.writeString(this.overview);
+        dest.writeString(this.releaseDate);
+        dest.writeString(this.posterPath);
+        dest.writeString(this.backdropPath);
+        dest.writeString(this.typeFavorite);
+    }
+
+    protected Favorite(Parcel in) {
+        this.id = in.readInt();
+        this.favorite_id = in.readInt();
+        this.title = in.readString();
+        this.overview = in.readString();
+        this.releaseDate = in.readString();
+        this.posterPath = in.readString();
+        this.backdropPath = in.readString();
+        this.typeFavorite = in.readString();
+    }
+
+    public static final Parcelable.Creator<Favorite> CREATOR = new Parcelable.Creator<Favorite>() {
+        @Override
+        public Favorite createFromParcel(Parcel source) {
+            return new Favorite(source);
+        }
+
+        @Override
+        public Favorite[] newArray(int size) {
+            return new Favorite[size];
+        }
+    };
+
+    @Override
+    public String toString() {
+        return "Favorite{" +
+                "id=" + id +
+                ", favorite_id=" + favorite_id +
+                ", title='" + title + '\'' +
+                ", overview='" + overview + '\'' +
+                ", releaseDate='" + releaseDate + '\'' +
+                ", posterPath='" + posterPath + '\'' +
+                ", backdropPath='" + backdropPath + '\'' +
+                ", typeFavorite='" + typeFavorite + '\'' +
+                '}';
     }
 }

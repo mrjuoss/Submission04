@@ -9,51 +9,24 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Favorite.class}, version = 1, exportSchema = false)
+@Database(entities = {Favorite.class}, version = 1)
 public abstract class FavoriteDatabase extends RoomDatabase {
 
-    public abstract FavoriteDao favoriteDao();
+    public static final String DATABASE_NAME = "favorites_db";
 
-    private static volatile FavoriteDatabase INSTANCE;
+    private static FavoriteDatabase instance;
 
-    static FavoriteDatabase getDatabase(final Context context) {
-        if (INSTANCE == null) {
-            synchronized (FavoriteDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            FavoriteDatabase.class, "favorite_db")
-                           .addCallback(callback)
-                            .build();
-                }
-            }
+    static FavoriteDatabase getInstance(final Context context) {
+        if (instance == null) {
+           instance = Room.databaseBuilder(
+                   context.getApplicationContext(),
+                   FavoriteDatabase.class,
+                   DATABASE_NAME
+           ).build();
         }
-        return INSTANCE;
+        return instance;
+
     }
 
-    private static RoomDatabase.Callback callback = new RoomDatabase.Callback() {
-        @Override
-        public void onOpen(@NonNull SupportSQLiteDatabase db) {
-            super.onOpen(db);
-            new PopulateDbAsync(INSTANCE).execute();
-        }
-    };
-
-    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
-
-        private final FavoriteDao mDao;
-
-        public PopulateDbAsync(FavoriteDatabase db) {
-            mDao = db.favoriteDao();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            mDao.deleteAll();
-            Favorite data = new Favorite(1, "2", "3", "4", "5", "6", "7");
-            mDao.insert(data);
-            data = new Favorite(1, "2", "3", "4", "5", "6", "7");
-            mDao.insert(data);
-            return null;
-        }
-    }
+    public abstract FavoriteDao getFavoriteDao();
 }

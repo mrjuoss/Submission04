@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -13,22 +12,22 @@ import java.util.List;
 @Dao
 public interface FavoriteDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(Favorite favorite);
+    @Insert
+    long[] insert(Favorite... favorites);
+
+    @Query("SELECT * FROM favorites")
+    LiveData<List<Favorite>> getFavorites();
+
+    @Query("SELECT * FROM favorites WHERE title LIKE :title")
+    List<Favorite> getFavoriteByCustomQuery(String title);
 
     @Update
-    void update(Favorite favorite);
+    int update(Favorite... favorites);
 
     @Delete
-    void delete(Favorite favorite);
+    int delete(Favorite... favorites);
 
-    @Query("DELETE FROM favorite")
+    @Query("DELETE FROM favorites")
     void deleteAll();
-
-    @Query("SELECT * FROM favorite WHERE title LIKE :title LIMIT 1")
-    Favorite findByName(String title);
-
-    @Query("SELECT * FROM favorite ORDER BY id")
-    LiveData<List<Favorite>> getAllFavorites();
 
 }

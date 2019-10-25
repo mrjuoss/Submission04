@@ -1,62 +1,39 @@
 package com.mrjuoss.dt.dicoding.submission04.room;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
+
+import com.mrjuoss.dt.dicoding.submission04.room.async.InsertAsyncTask;
 
 import java.util.List;
 
 public class FavoriteRepository {
 
+    private FavoriteDatabase mFavoriteDatabase;
+
+    public FavoriteRepository(Context context) {
+        mFavoriteDatabase = FavoriteDatabase.getInstance(context);
+    }
+
     private FavoriteDao favoriteDao;
     private LiveData<List<Favorite>> mAllFavorites;
 
-    public FavoriteRepository(Application application) {
-        FavoriteDatabase db = FavoriteDatabase.getDatabase(application);
-        favoriteDao = db.favoriteDao();
-        mAllFavorites = favoriteDao.getAllFavorites();
+    public void insertFavorite(Favorite favorite) {
+        new InsertAsyncTask(mFavoriteDatabase.getFavoriteDao()).execute(favorite);
     }
 
-    public LiveData<List<Favorite>> getAllFavorites() {
-        return mAllFavorites;
+    public void updateFavorite(Favorite favorite) {
+
     }
 
-    public void insert (Favorite favorite) {
-        new InsertAsyncTask(favoriteDao).execute(favorite);
+    public LiveData<List<Favorite>> retrieveFavorites() {
+        return mFavoriteDatabase.getFavoriteDao().getFavorites();
     }
 
-    public void delete (Favorite favorite) {
-        new DeleteAsyncTask(favoriteDao).execute(favorite);
+    public void deleteFavorite(Favorite favorite) {
+
     }
-
-    private static class InsertAsyncTask extends AsyncTask<Favorite, Void, Void> {
-        private FavoriteDao mAsyncTaskDao;
-
-        InsertAsyncTask(FavoriteDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final Favorite... params) {
-            mAsyncTaskDao.insert(params[0]);
-            return null;
-        }
-    }
-
-    private static class DeleteAsyncTask extends AsyncTask<Favorite, Void, Void> {
-        private FavoriteDao mAsyncTaskDao;
-
-        DeleteAsyncTask(FavoriteDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final Favorite... params) {
-            mAsyncTaskDao.delete(params[0]);
-            return null;
-        }
-    }
-
-
 }
