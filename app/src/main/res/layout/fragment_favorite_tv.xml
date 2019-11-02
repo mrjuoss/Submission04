@@ -5,10 +5,10 @@
     android:layout_height="match_parent"
     tools:context=".ui.favorite.FavoriteTvFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_fav_tv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/favorite_tv_fragment" />
+        tools:listitem="@layout/item_card_view_tv"/>
 
 </FrameLayout>

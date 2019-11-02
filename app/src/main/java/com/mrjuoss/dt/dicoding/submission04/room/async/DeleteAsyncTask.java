@@ -18,7 +18,7 @@ public class DeleteAsyncTask extends AsyncTask<Favorite, Void, Void> {
     @Override
     protected Void doInBackground(Favorite... favorites) {
         Log.d(TAG, "doInBackground: thread " + Thread.currentThread().getName());
-        mFavoriteDao.deleteFavorite(favorites);
+        mFavoriteDao.deleteFavorite(favorites[0]);
         return null;
     }
 }

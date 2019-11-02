@@ -1,8 +1,6 @@
 package com.mrjuoss.dt.dicoding.submission04.ui.movie;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -10,31 +8,23 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.bumptech.glide.Glide;
 import com.mrjuoss.dt.dicoding.submission04.R;
 import com.mrjuoss.dt.dicoding.submission04.model.movie.ResultsItem;
 import com.mrjuoss.dt.dicoding.submission04.room.Favorite;
-import com.mrjuoss.dt.dicoding.submission04.room.FavoriteRepository;
+import com.mrjuoss.dt.dicoding.submission04.viewmodel.FavoriteViewModel;
 
-public class MovieDetailActivity extends AppCompatActivity implements View.OnClickListener {
-
-    public static final String TAG = "MovieDetailActivity";
+public class MovieDetailActivity extends AppCompatActivity{
 
     public static final String EXTRA_MOVIE = "extra_movie";
-    public static final int NEW_FAVORITE_ACTIVITY_REQUEST_CODE = 1;
 
-    private FavoriteRepository mFavoriteRepository;
     private Favorite mFavorite;
+    private FavoriteViewModel mFavoriteViewModel;
 
     ProgressBar progressBarDetailMovie;
-    ImageView imageDetailPosterMovie;
-    TextView textDetailTitleMovie;
-    TextView textDetailRatingMovie;
-    TextView textDetailreleaseMovie;
-    TextView textDetailOverviewMovie;
     Button buttonFavorite;
 
     @Override
@@ -42,22 +32,20 @@ public class MovieDetailActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
+        mFavoriteViewModel = ViewModelProviders.of(this).get(FavoriteViewModel.class);
+
         progressBarDetailMovie = findViewById(R.id.progress_bar_detail_movie);
-        imageDetailPosterMovie = findViewById(R.id.image_detail_poster_movie);
-        textDetailTitleMovie = findViewById(R.id.text_detail_title_movie);
-        textDetailRatingMovie = findViewById(R.id.text_detail_rating_movie);
-        textDetailreleaseMovie = findViewById(R.id.text_detail_release_movie);
-        textDetailOverviewMovie = findViewById(R.id.text_detail_overview_movie);
+        ImageView imageDetailPosterMovie = findViewById(R.id.image_detail_poster_movie);
+        TextView textDetailTitleMovie = findViewById(R.id.text_detail_title_movie);
+        TextView textDetailRatingMovie = findViewById(R.id.text_detail_rating_movie);
+        TextView textDetailreleaseMovie = findViewById(R.id.text_detail_release_movie);
+        TextView textDetailOverviewMovie = findViewById(R.id.text_detail_overview_movie);
 
         progressBarDetailMovie.setVisibility(View.VISIBLE);
 
-        buttonFavorite = findViewById(R.id.button_favorite_movie);
-        buttonFavorite.setTag("add");
-        buttonFavorite.setOnClickListener(this);
+        mFavoriteViewModel = ViewModelProviders.of(this).get(FavoriteViewModel.class);
 
-        Log.d(TAG, "onCreate: thread " + Thread.currentThread().getName());
-        //showDetail();
-        ResultsItem movie = getIntent().getParcelableExtra(EXTRA_MOVIE);
+        final ResultsItem movie = getIntent().getParcelableExtra(EXTRA_MOVIE);
 
         String rating = Double.toString(movie.getVoteAverage());
         String url_backdrop = "https://image.tmdb.org/t/p/w185" + movie.getBackdropPath();
@@ -75,38 +63,26 @@ public class MovieDetailActivity extends AppCompatActivity implements View.OnCli
 
         progressBarDetailMovie.setVisibility(View.INVISIBLE);
 
-    }
+        buttonFavorite = findViewById(R.id.button_favorite_movie);
+        buttonFavorite.setTag("add");
+        buttonFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFavorite = new Favorite(movie.getId(), movie.getTitle(), movie.getOverview(), movie.getReleaseDate(), movie.getPosterPath(), movie.getBackdropPath(), "movie");
 
-    @Override
-    public void onClick(View v) {
-        mFavoriteRepository = new FavoriteRepository(this);
-        if (v.getId() == R.id.button_favorite_movie) {
-            Intent intent = new Intent(this, MovieDetailActivity.class);
-            startActivityForResult(intent, NEW_FAVORITE_ACTIVITY_REQUEST_CODE);
-        }
-    }
+                if (buttonFavorite.getTag().toString() == "add") {
+                    mFavoriteViewModel.insert(mFavorite);
+                    Toast.makeText(getApplicationContext(), "Berhasil Simpan Data", Toast.LENGTH_SHORT).show();
+                    buttonFavorite.setTag("remove");
+                    buttonFavorite.setText(R.string.remove_favorite);
+                } else {
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == NEW_FAVORITE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            ResultsItem movie = getIntent().getParcelableExtra(EXTRA_MOVIE);
-            mFavorite = new Favorite(movie.getId(), movie.getTitle(), movie.getOverview(), movie.getReleaseDate(), movie.getPosterPath(), movie.getBackdropPath(), "movie");
-
-            if (buttonFavorite.getTag().toString() == "add") {
-                mFavoriteRepository.insertFavorite(mFavorite);
-                Toast.makeText(this, "Berhasil Simpan Data", Toast.LENGTH_SHORT).show();
-                buttonFavorite.setTag("remove");
-                buttonFavorite.setText(R.string.remove_favorite);
-            } else {
-                mFavoriteRepository.deleteFavorite(mFavorite);
-                Toast.makeText(this, "Berhasil menghapus data", Toast.LENGTH_SHORT).show();
-                buttonFavorite.setTag("add");
-                buttonFavorite.setText(R.string.add_favorite);
+                    Toast.makeText(getApplicationContext(), "Berhasil menghapus data", Toast.LENGTH_SHORT).show();
+                    buttonFavorite.setTag("add");
+                    buttonFavorite.setText(R.string.add_favorite);
+                }
             }
-
-        } else {
-            Toast.makeText(this, "Gagal Simpan Data", Toast.LENGTH_SHORT).show();
-        }
+        });
     }
+
 }

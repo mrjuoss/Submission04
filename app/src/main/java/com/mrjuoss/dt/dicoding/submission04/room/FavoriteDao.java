@@ -7,26 +7,28 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import java.sql.Struct;
 import java.util.List;
 
 @Dao
 public interface FavoriteDao {
 
     @Insert
-    long[] insertFavorite(Favorite... favorites);
+    void insert(Favorite favorite);
 
     @Query("SELECT * FROM favorites")
     LiveData<List<Favorite>> getFavorites();
+
+    @Query("SELECT * FROM favorites WHERE favorite_type LIKE :type")
+    LiveData<List<Favorite>> getFavoritesByType(String type);
 
     @Query("SELECT * FROM favorites WHERE title LIKE :title")
     List<Favorite> getFavoriteByCustomQuery(String title);
 
     @Delete
-    int deleteFavorite(Favorite... favorites);
+    int deleteFavorite(Favorite favorite);
 
     @Query("DELETE FROM favorites")
     void deleteAll();
 
-    @Update
-    int update(Favorite... favorites);
 }
